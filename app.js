@@ -4,6 +4,7 @@ require('dotenv-extended').load();
 var builder = require('botbuilder');
 var restify = require('restify');
 
+
 // Setup Restify Server
 var server = restify.createServer();
 server.listen(process.env.port || process.env.PORT || 3978, function () {
@@ -19,8 +20,8 @@ server.post('/api/messages', connector.listen());
 
 var DialogLabels = {
     Poderes: 'Poderes',
-    Partidas: 'Partidas',
-    Proyectos: 'Proyectos'
+    Inmuebles: 'Inmuebles',
+  /*   Proyectos: 'Proyectos' */
 };
 
 // Bot Storage: Here we register the state storage for your bot. 
@@ -34,8 +35,8 @@ var bot = new builder.UniversalBot(connector, [
         // prompt for search option
         builder.Prompts.choice(
             session,
-            'Estoy atento. Dime, ¿Qué deseas consultar?',
-            [DialogLabels.Partidas, DialogLabels.Poderes, DialogLabels.Proyectos],
+            'Dime, ¿tu consulta a que segmento está dirigido?',
+            [DialogLabels.Inmuebles, DialogLabels.Poderes],
             {
                 maxRetries: 3,
                 retryPrompt: 'Lo siento, no he encontrado esta información'
@@ -57,24 +58,33 @@ var bot = new builder.UniversalBot(connector, [
         // continue on proper dialog
         var selection = result.response.entity;
         switch (selection) {
-            case DialogLabels.Partidas:
-                return session.beginDialog('Partidas');
+            case DialogLabels.Inmuebles:
+                return session.beginDialog('Inmuebles');
             case DialogLabels.Poderes:
                 return session.beginDialog('Poderes');
-            case DialogLabels.Proyectos:
-                return session.beginDialog('Proyectos');
+        /*    case DialogLabels.Proyectos:
+                return session.beginDialog('Proyectos'); */
         }
     }
 ]).set('storage', inMemoryStorage); // Register in memory storage
 
-bot.dialog('Partidas', require('./partidas'));
+bot.dialog('Inmuebles', require('./inmuebles'));
 bot.dialog('Poderes', require('./poderes'));
-bot.dialog('Proyectos', require('./proyectos'))
-    .triggerAction({
-        matches: [/help/i, /Proyectos/i, /problem/i]
-    });
+bot.dialog('NumPartida', require('./partida'));
+bot.dialog('Des_Inmueble', require('./inmueble'));
+bot.dialog('Propietario', require('./propietario'));
 
+/*     bot.dialog('Num_Partida', require('./partida'))
+    bot.dialog('Des_Inmueble', require('./inmueble'))
+    bot.dialog('Proyectos', require('./propietario')).triggerAction({
+        matches: [/inmueble/i, /partida/i, /propietario/i],
+    }) */
 // log any bot errors into the console
 bot.on('error', function (e) {
     console.log('And error ocurred', e);
 });
+
+module.exports = {
+    connector,
+    bot,
+}
