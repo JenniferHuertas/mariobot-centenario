@@ -23,6 +23,7 @@
   "dependencies": {
     "bluebird": "^3.4.7",
     "botbuilder": "^3.30.0",
+    "botbuilder-ai": "^4.9.2",
     "dotenv-extended": "^1.0.4",
     "restify": "^8.5.1"
   }
